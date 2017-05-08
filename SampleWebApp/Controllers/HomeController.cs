@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ImageSharp;
 
 namespace SampleWebApp.Controllers
 {
@@ -30,6 +31,12 @@ namespace SampleWebApp.Controllers
         public IActionResult Error()
         {
             return View();
+        }
+
+        public IActionResult Test()
+        {
+            Configuration.Default.AddImageFormat(new ImageSharp.Formats.JpegFormat());
+            return Content("Hello");
         }
     }
 }
