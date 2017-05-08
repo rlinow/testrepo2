@@ -17,6 +17,7 @@ namespace SampleWebApp
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
+                .UseUrls("http://*:5000")
                 .Build();
 
             host.Run();
