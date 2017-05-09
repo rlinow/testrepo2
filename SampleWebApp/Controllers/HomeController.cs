@@ -34,17 +34,22 @@ namespace SampleWebApp.Controllers
             return View();
         }
 
-        public IActionResult Test()
+        public async Task<IActionResult> Test(int width = 500, int height = 500)
         {
-            string onePixelGifBase64 = "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-            byte[] content = Convert.FromBase64String(onePixelGifBase64);
+            string url = "https://dwsimg.dealercenter.net/inv-img/SUFQd01nSWdGejd3a0JxR2FqbmhnWGErMFFHWU9VVnVvVWk1NVFnZCtYY1JiU3FldTZvblVyY2xyVS9Ja08vTlU0M2ZnK1lFWVh6ejJydHZNblBUcmc9PQ%3d%3d/67601140-0604-48e8-a6af-2d2bd970d352/640/480";
+            byte[] content, resizedContent;
+            using (var httpClient = new System.Net.Http.HttpClient()) {
+                content = await (await httpClient.GetAsync(url)).Content.ReadAsByteArrayAsync();
+            }
             Configuration.Default.AddImageFormat(new ImageSharp.Formats.GifFormat());
-            var image = Image.Load(content);
-            var ms = new System.IO.MemoryStream();
-            image.Resize(new ImageSharp.Processing.ResizeOptions { Size = new Size(100, 100) });
-            image.Save(ms);
-            var newContent = ms.ToArray();
-            return File(newContent, "image/gif");
+            var image = Image.Load(content, new ImageSharp.Formats.JpegDecoder());
+            using (var ms = new System.IO.MemoryStream())
+            {
+                image.Resize(new ImageSharp.Processing.ResizeOptions { Size = new Size(width, height), Mode = ImageSharp.Processing.ResizeMode.Max });
+                image.Save(ms, new ImageSharp.Formats.JpegEncoder());
+                resizedContent = ms.ToArray();
+            }
+            return File(resizedContent, "image/jpeg");
         }
     }
 }
